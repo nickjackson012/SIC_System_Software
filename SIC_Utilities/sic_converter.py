@@ -1,5 +1,5 @@
 from SIC_Utilities.sic_constants import DEC_TO_HEX_DICT, MINIMUM_MEMORY_ADDRESS_DEC, MAXIMUM_MEMORY_ADDRESS_DEC, \
-    MEMORY_ADDRESS_STRING_LENGTH, HEX_TO_DEC_DICT
+    MEMORY_ADDRESS_STRING_LENGTH, HEX_TO_DEC_DICT, HEX_DIGIT_SET
 
 
 class SICConverterError(Exception):
@@ -67,3 +67,9 @@ def hex_string_to_dec(hex_string: str):
     return dec_value
 
 
+def test_for_hex(hex_string):
+    for character in hex_string:
+        if character not in HEX_DIGIT_SET:
+            return False
+
+    return True

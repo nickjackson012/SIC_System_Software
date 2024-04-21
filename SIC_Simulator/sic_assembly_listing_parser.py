@@ -1,85 +1,71 @@
 import os.path
 import sys
 
-from SIC_Utilities.sic_constants import SIC_DEFAULT_WORKING_DIRECTORY, SIC_ASSEMBLY_LISTING_FILE_EXTENSION
+from SIC_Simulator.sic_configuration import SIC_DEFAULT_WORKING_DIRECTORY
+from SIC_Utilities.sic_constants import SIC_ASSEMBLY_LISTING_FILE_EXTENSION
 from SIC_Utilities.sic_messaging import print_error, print_status
 
 
-def sic_assembly_listing_parser(assembly_listing_file_path):
-    # STATUS
-    print_status("Beginning parsing", assembly_listing_file_path)
-    if os.path.exists(assembly_listing_file_path):
-        assembly_listing_file = open(assembly_listing_file_path, "rt")
+class SICAssemblyListingParserError(Exception):
+    pass
 
-        parsed_listing_dict_list = []
-        # line_of_listing_number = 0
 
-        start_found = False
+# This function opens and reads an assembly listing file (*.lst).
+# It processes each line of code one at a time
+# It parses out all the relevant assembly listing tokens and stores them in a line of listing dictionary.
+# It returns a list containing all the parsed line of listing dictionaries.
+def sic_assembly_listing_parser(assembly_listing_file):
+    parsed_listing_dict_list = []
 
-        end_found = False
+    start_found = False
 
-        for line_of_listing in assembly_listing_file:
-            # line_of_listing_number += 1
+    end_found = False
 
-            memory_address = line_of_listing[:4]
-            unparsed_line_of_listing = line_of_listing[:-1]
+    for line_of_listing in assembly_listing_file:
 
-            if line_of_listing.isspace():
-                # Close assembly listing file, print error message, and exit program.
-                assembly_listing_file.close()
-                # ERROR
-                print_error("SIC Assembly Listing Parser Error: Can not have a blank line in the assembly listing file")
+        memory_address = line_of_listing[:4]
+        unparsed_line_of_listing = line_of_listing[:-1]
 
-                sys.exit()
-
-            if not start_found:
-                if line_of_listing[19:28].rstrip() == "START":
-                    start_found = True
-                else:
-                    # Close assembly listing file, print error message, and exit program.
-                    assembly_listing_file.close()
-                    # ERROR
-                    print_error("SIC Assembly Listing Parser Error: START must be the first opcode in the assembly listing",
-                                unparsed_line_of_listing)
-
-                    sys.exit()
-            else:
-                if line_of_listing[19:28].rstrip() == "END":
-                    assembly_listing_file.close()
-                    # STATUS
-                    print_status("Parsing complete", assembly_listing_file_path)
-                    return parsed_listing_dict_list
-
-                else:
-                    parsed_listing_dict = {memory_address: unparsed_line_of_listing}
-
-                    parsed_listing_dict_list.append(parsed_listing_dict)
-
-        if not end_found:
+        if line_of_listing.isspace():
             # Close assembly listing file, print error message, and exit program.
             assembly_listing_file.close()
             # ERROR
-            print_error("SIC Assembly Listing Parser Error: END was not found in assembly listing file")
+            raise SICAssemblyListingParserError("Can not have a blank line in the assembly listing file")
 
-            sys.exit()
+        if not start_found:
+            if line_of_listing[19:28].rstrip() == "START":
+                start_found = True
+            else:
+                # Close assembly listing file and throw exception.
+                assembly_listing_file.close()
+                # ERROR
+                raise SICAssemblyListingParserError("START must be the first opcode in the assembly listing file.")
+        else:
+            if line_of_listing[19:28].rstrip() == "END":
+                assembly_listing_file.close()
+                return parsed_listing_dict_list
 
-    else:
-        # print error message, and exit program.
-        # ERROR
-        print_error("SIC Assembly Listing Parser Error: Assembly listing file does not exist",)
+            else:
+                parsed_listing_dict = {memory_address: unparsed_line_of_listing}
 
-        sys.exit()
+                parsed_listing_dict_list.append(parsed_listing_dict)
+
+    if not end_found:
+        # Close assembly listing file, print error message, and exit program.
+        assembly_listing_file.close()
+        raise SICAssemblyListingParserError("END was not found in the assembly listing file")
+
 
 
 # TEST BED
 
-assembly_listing_file_name = "ReadWriteTest02"
-
-assembly_listing_file_path = (SIC_DEFAULT_WORKING_DIRECTORY +
-                              assembly_listing_file_name + "." +
-                              SIC_ASSEMBLY_LISTING_FILE_EXTENSION)
-
-parsed_listing_dict_list = sic_assembly_listing_parser(assembly_listing_file_path)
-
-for line in parsed_listing_dict_list:
-    print(line)
+# assembly_listing_file_name = "ReadWrite"
+#
+# assembly_listing_file_path = (SIC_DEFAULT_WORKING_DIRECTORY +
+#                               assembly_listing_file_name + "." +
+#                               SIC_ASSEMBLY_LISTING_FILE_EXTENSION)
+#
+# parsed_listing_dict_list = sic_assembly_listing_parser(assembly_listing_file_path)
+#
+# for line in parsed_listing_dict_list:
+#     print(line)

@@ -9,10 +9,6 @@ ROWS_IN_MEMORY_DUMP = BYTES_IN_MEMORY // BYTES_PER_ROW
 EMPTY_BYTE = "--"
 
 
-class SICAddressOutOfRangeError(Exception):
-    pass
-
-
 def initialize_memory():
     # Create an empty dictionary to model memory
     # Load dictionary with empty bytes
