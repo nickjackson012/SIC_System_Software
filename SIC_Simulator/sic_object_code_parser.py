@@ -126,7 +126,6 @@ def sic_object_code_parser(object_code_file):
     return parsed_object_code_dict_list
 
 
-
 # TEST BED
 # object_code_file_name = "ReadWrite"
 #
@@ -134,11 +133,9 @@ def sic_object_code_parser(object_code_file):
 #                          object_code_file_name + "." +
 #                          SIC_OBJECT_CODE_FILE_EXTENSION)
 #
-# parse_header_record("HCOPY  00100000107A")
-# parse_text_record("T0010001E1410334820390010362810303010154820613C100300102A0C103900102D")
-# parse_end_record("E001000")
+# object_code_file = open(object_code_file_path, "rt")
 #
-# parsed_object_code_dict_list = sic_object_code_parser(object_code_file_path)
+# parsed_object_code_dict_list = sic_object_code_parser(object_code_file)
 #
 # for line in parsed_object_code_dict_list:
 #     print(line)

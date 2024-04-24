@@ -391,7 +391,7 @@ def assembler_pass_two(parsed_code_dict_list, assembly_code_file_path):
 
 assembly_code_file_name = "ReadWrite.asm"
 # assembly_code_file_name = "ReadWriteTest02.asm"
-assembly_code_file_path = ("/Users/nickjackson012/Desktop/Pycharm Projects/SIC_System_Software/Assembly Code/" + assembly_code_file_name)
+assembly_code_file_path = ("/Users/nickjackson/Desktop/Pycharm Projects/SIC_System_Software/Assembly Code/" + assembly_code_file_name)
 
 parsed_code_dict_list = parse_assembly_code_file(assembly_code_file_path)
 
