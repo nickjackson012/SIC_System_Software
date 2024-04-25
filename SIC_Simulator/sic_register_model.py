@@ -11,8 +11,8 @@ class RegisterContentsError(Exception):
 class SICRegisterModel:
     def __init__(self, register_name):
         self.register_name = register_name
-        self.hex_string = "FFFFFF"
-        self.bin_string = "111111111111111111111111"
+        self.hex_string = "------"
+        self.bin_string = "------------------------"
 
     def get_register_name(self):
         return self.register_name

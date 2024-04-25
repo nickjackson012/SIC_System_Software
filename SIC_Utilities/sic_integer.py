@@ -5,6 +5,7 @@ from SIC_Utilities.sic_constants import NUMBER_OF_BITS_IN_A_INTEGER, MINIMUM_INT
 class SICIntegerError(Exception):
     pass
 
+
 def bin_string_to_dec(bin_value_string: str):
     # Confirm bin_value is a string
     # Confirm bin_value is the proper length
@@ -54,20 +55,20 @@ def bin_string_to_dec(bin_value_string: str):
 # Test Bed
 
 
-try:
-    dec_value1 = bin_string_to_dec("101010101010101010101010")
-    print("dec_value1:", dec_value1)
-    dec_value2 = bin_string_to_dec("000000000000000010101010")
-    print("dec_value2:", dec_value2)
-    dec_value3 = bin_string_to_dec("101011101010101010101011")
-    print("dec_value3:", dec_value3)
-    dec_value4 = bin_string_to_dec("01010101010101010101010")
-    print("dec_value4:", dec_value4)
-    dec_value5 = bin_string_to_dec("101010101010101111010101010")
-    print("dec_value5:", dec_value5)
-
-except SICIntegerError:
-    print("Invalid Value")
+# try:
+#     dec_value1 = bin_string_to_dec("101010101010101010101010")
+#     print("dec_value1:", dec_value1)
+#     dec_value2 = bin_string_to_dec("000000000000000010101010")
+#     print("dec_value2:", dec_value2)
+#     dec_value3 = bin_string_to_dec("101011101010101010101011")
+#     print("dec_value3:", dec_value3)
+#     dec_value4 = bin_string_to_dec("01010101010101010101010")
+#     print("dec_value4:", dec_value4)
+#     dec_value5 = bin_string_to_dec("101010101010101111010101010")
+#     print("dec_value5:", dec_value5)
+#
+# except SICIntegerError:
+#     print("Invalid Value")
 
 
 # Exceptions: ValueError, IntegerOutOfRangeError
@@ -125,17 +126,16 @@ def dec_to_bin_string(dec_value: int):
 
     return binary_number_string
 
-
 # Test Bed
 
 
-try:
-    binary_value1 = dec_to_bin_string(-5592406)
-    print("binary_value1", binary_value1)
-    binary_value2 = dec_to_bin_string(170)
-    print("binary_value2", binary_value2)
-    binary_value3 = dec_to_bin_string(-5330261)
-    print("binary_value3", binary_value3)
-
-except SICIntegerError:
-    print("Invalid Value")
+# try:
+#     binary_value1 = dec_to_bin_string(-5592406)
+#     print("binary_value1", binary_value1)
+#     binary_value2 = dec_to_bin_string(170)
+#     print("binary_value2", binary_value2)
+#     binary_value3 = dec_to_bin_string(-5330261)
+#     print("binary_value3", binary_value3)
+#
+# except SICIntegerError:
+#     print("Invalid Value")

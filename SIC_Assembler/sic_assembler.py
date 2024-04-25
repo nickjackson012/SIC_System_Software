@@ -269,7 +269,7 @@ def assembler_pass_two(parsed_code_dict_list, assembly_code_file_path):
 
     for line_of_code_dict in parsed_code_dict_list:
         # DEBUG
-        print(line_of_code_dict)
+        # print(line_of_code_dict)
         # Initialize object code
         object_code = ""
         # Handle the various opcodes and generate object code
@@ -331,9 +331,11 @@ def assembler_pass_two(parsed_code_dict_list, assembly_code_file_path):
                 # Create and write assembly listing line
                 assembly_listing_line = create_assembly_listing_line(line_of_code_dict)
                 assembly_listing_file.write(assembly_listing_line)
-                # Create object code end record and write to object code file
-                object_code_file.write(create_object_code_text_record(object_code_text_record_header,
-                                                                      object_code_text_record_body))
+                # Write the last text record to the object code if it exists
+                if object_code_text_record_header != "":
+                    object_code_file.write(create_object_code_text_record(object_code_text_record_header,
+                                                                          object_code_text_record_body))
+                # Create object code end record
                 object_code_end_record = ("E" + start_address_hex.rjust(6, "0") + "\n")
 
                 object_code_file.write(object_code_end_record)
@@ -344,6 +346,8 @@ def assembler_pass_two(parsed_code_dict_list, assembly_code_file_path):
                 # STATUS
                 print_status("Object code file written and closed", object_code_file_path)
                 print_status("Assembly listing file written and closed", assembly_listing_file_path)
+
+                sys.exit()
             case _:
                 # Create object code for all other opcodes and add to line of code dict
                 try:
@@ -386,17 +390,26 @@ def assembler_pass_two(parsed_code_dict_list, assembly_code_file_path):
 # Create path to assembly code file
 # NOTE: This is just temporary.
 # File should be indicated at run time.
-# assembly_code_file_name = "ReadWrite.asm"
-
-
-assembly_code_file_name = "ReadWrite.asm"
-# assembly_code_file_name = "ReadWriteTest02.asm"
-assembly_code_file_path = ("/Users/nickjackson/Desktop/Pycharm Projects/SIC_System_Software/Assembly Code/" + assembly_code_file_name)
+# assembly_code_file_name = "ReadWrite.asm"\
+assembly_code_file_path = ("/Users/nickjackson/Desktop/Pycharm Projects/SIC_System_Software/Assembly Code/")
 
 parsed_code_dict_list = parse_assembly_code_file(assembly_code_file_path)
 
 assembler_pass_one(parsed_code_dict_list)
 
 assembler_pass_two(parsed_code_dict_list, assembly_code_file_path)
+
+# TEST BED
+# assembly_code_file_name = "ReadWrite.asm"
+# assembly_code_file_name = "ReadWriteTest02.asm"
+# assembly_code_file_name = "Sum.asm"
+# assembly_code_file_name = "SumModified.asm"
+# assembly_code_file_path = ("/Users/nickjackson/Desktop/Pycharm Projects/SIC_System_Software/Assembly Code/" + assembly_code_file_name)
+#
+# parsed_code_dict_list = parse_assembly_code_file(assembly_code_file_path)
+#
+# assembler_pass_one(parsed_code_dict_list)
+#
+# assembler_pass_two(parsed_code_dict_list, assembly_code_file_path)
 
 # print("label_dict: ", label_dict)

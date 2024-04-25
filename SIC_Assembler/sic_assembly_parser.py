@@ -394,6 +394,7 @@ def parse_assembly_code_file(assembly_code_file_path):
 # Create path to assembly code file
 # NOTE: This is just temporary.
 # File should be indicated at run time.
+# TEST BED
 # assembly_code_file_name = "ReadWrite.asm"
 # assembly_code_file_name = "ReadWriteTest01.asm"
 # assembly_code_file_name = "ReadWriteTest02.asm"
