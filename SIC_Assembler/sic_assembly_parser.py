@@ -1,12 +1,11 @@
 import os
-import sys
 
 from SIC_Utilities.sic_constants import COMMENT_LINE_INDICATOR, MINIMUM_MEMORY_ADDRESS_DEC, MAXIMUM_MEMORY_ADDRESS_DEC, \
     OPCODE_VALIDATION_SET, LONE_OPCODE_VALIDATION_SET, MAXIMUM_LENGTH_OF_START_OPERAND, MINIMUM_BYTE_OPERAND_LENGTH, \
     MAXIMUM_BYTE_OPERAND_LENGTH, HEX_DIGIT_SET, MINIMUM_INTEGER, MAXIMUM_INTEGER, MINIMUM_RESB, MAXIMUM_RESB, \
     MINIMUM_RESW, MAXIMUM_RESW, MAXIMUM_LENGTH_OF_OPERAND
 from SIC_Utilities.sic_converter import hex_string_to_dec, SICConverterError
-from SIC_Utilities.sic_messaging import print_status, print_error
+from SIC_Utilities.sic_messaging import print_status
 
 
 class SICAssemblyParserError(Exception):
@@ -171,7 +170,7 @@ def validate_resb_operand(operand):
     if MINIMUM_RESB <= resb_value <= MAXIMUM_RESB:
         return operand
     else:
-        raise SICAssemblyParserError("RESB operand can be no larger than 32768")
+        raise SICAssemblyParserError("RESB operand must be between 0 and 32768")
 
 
 # This function validates the RESW operand.
@@ -189,7 +188,7 @@ def validate_resw_operand(operand):
     if MINIMUM_RESW <= resw_value <= MAXIMUM_RESW:
         return operand
     else:
-        raise SICAssemblyParserError("RESW operand must be no larger than 10,922")
+        raise SICAssemblyParserError("RESW operand must be between 0 and 10,922")
 
 
 # This function validates the operand for all other opcodes.
@@ -203,7 +202,7 @@ def validate_nonspecific_operand(operand):
     # Check for indexed addressing indicator and remove indicator from operand.
     if operand[-2:] == ",X":
         operand = operand[:-2]
-    if operand[0].isalpha:
+    if operand[0].isalpha():
         # Operand will be validated as label.
         characters_valid = operand.isupper() and operand.isalnum()
         length_valid = 0 < len(operand) <= 6
@@ -290,10 +289,9 @@ def parse_assembly_code_file(assembly_code_file_path):
                 # Close assembly file, print error message, and exit program.
                 assembly_code_file.close()
                 # ERROR
-                print_error("SIC Assembly Parser Error: Line is blank. Line must contain code or comment",
-                            "LINE" + str(line_of_code_number) + ": " + unparsed_line_of_code)
-
-                sys.exit()
+                raise SICAssemblyParserError("Parser Error: Line is blank. Line must contain code or comment" + "\n" +
+                                             "LINE" + str(line_of_code_number) +
+                                             ": " + unparsed_line_of_code)
 
             # Determine if line of code is a comment line
             is_comment_line = test_for_comment_line(line_of_code)
@@ -337,10 +335,9 @@ def parse_assembly_code_file(assembly_code_file_path):
                 # Close assembly file, print error message, and exit program.
                 assembly_code_file.close()
                 # ERROR
-                print_error("SIC Assembly Parser Error: " + str(ex),
-                            "LINE " + str(line_of_code_number) + ": " + unparsed_line_of_code)
-
-                sys.exit()
+                raise SICAssemblyParserError("Parser Error: " + str(ex) + "\n" +
+                                             "LINE " + str(line_of_code_number) +
+                                             ": " + unparsed_line_of_code)
 
             parsed_code_dict["comment"] = False
 
@@ -352,10 +349,10 @@ def parse_assembly_code_file(assembly_code_file_path):
                     # Close assembly file, print error message, and exit program.
                     assembly_code_file.close()
                     # ERROR
-                    print_error("SIC Assembly Parser Error: START must be the first opcode called in assembly program.",
-                                "LINE " + str(line_of_code_number) + ": " + unparsed_line_of_code)
-
-                    sys.exit()
+                    raise SICAssemblyParserError("Parser Error: START must be the first opcode called in assembly "
+                                                 + "program\n" +
+                                                 "LINE " + str(line_of_code_number) +
+                                                 ": " + unparsed_line_of_code)
 
             parsed_code_dict["unparsed_line_of_code"] = unparsed_line_of_code
 
@@ -377,24 +374,21 @@ def parse_assembly_code_file(assembly_code_file_path):
             print_status("Parsing complete")
         else:
             # if END assembly directive is not found, then assembly code is invalid and error is raised.
+            assembly_code_file.close()
             # ERROR
-            print_error("SIC Assembly Parser Error: No END assembly directive found.")
-
-            sys.exit()
+            raise SICAssemblyParserError("Parser Error: No END assembly directive found.")
 
         return parsed_code_dict_list
 
     else:
         # ERROR
-        print_error("SIC assembly code file does not exist.", assembly_code_file_path)
-
-        sys.exit()
+        raise SICAssemblyParserError("SIC assembly code file does not exist." + "\n" + assembly_code_file_path)
 
 
+# TEST BED
 # Create path to assembly code file
 # NOTE: This is just temporary.
 # File should be indicated at run time.
-# TEST BED
 # assembly_code_file_name = "ReadWrite.asm"
 # assembly_code_file_name = "ReadWriteTest01.asm"
 # assembly_code_file_name = "ReadWriteTest02.asm"

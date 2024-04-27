@@ -10,12 +10,6 @@ from SIC_Simulator.sic_register_model import dump_registers, REGISTER_DICT, REGI
 from SIC_Utilities.sic_constants import SIC_OBJECT_CODE_FILE_EXTENSION, SIC_ASSEMBLY_LISTING_FILE_EXTENSION
 from SIC_Utilities.sic_messaging import print_status, print_error
 
-LOAD_MENU = "(l)oad, (q)uit"
-RUN_MENU = "(s)tep, (d)ump, (r)un, (q)uit"
-QUIT_CONFIRM = "Are you sure you want to quit? (y)es, (n)o"
-SIC_PROMPT = "SIC> "
-UNRECOGNIZED_COMMAND = "Unrecognized command"
-
 
 class SICSimulatorError(Exception):
     pass
@@ -71,6 +65,16 @@ def verify_and_open_program_files(program_file_name):
     # Return the program file dictionary
     return program_file_dict
 
+
+##############################
+# SIC SIMULATOR USER INTERFACE
+##############################
+
+LOAD_MENU = "(l)oad, (q)uit"
+RUN_MENU = "(s)tep, (d)ump, (r)un, (q)uit"
+QUIT_CONFIRM = "Are you sure you want to quit? (y)es, (n)o"
+SIC_PROMPT = "SIC> "
+UNRECOGNIZED_COMMAND = "Unrecognized command"
 
 memory_model_dict = {}
 
