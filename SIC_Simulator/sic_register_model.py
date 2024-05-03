@@ -1,7 +1,4 @@
-from SIC_Utilities.sic_constants import HEX_TO_BIN_DICT, BIN_TO_HEX_DICT
-
-NUMBER_OF_HEX_DIGITS = 6
-NUMBER_OF_BIN_DIGITS = 24
+from SIC_Utilities.sic_constants import HEX_TO_BIN_DICT, BIN_TO_HEX_DICT, INITIALIZATION_CHARACTER
 
 
 class RegisterContentsError(Exception):
@@ -9,10 +6,17 @@ class RegisterContentsError(Exception):
 
 
 class SICRegisterModel:
+    NUMBER_OF_HEX_DIGITS = 6
+    NUMBER_OF_BIN_DIGITS = 24
+
     def __init__(self, register_name):
         self.register_name = register_name
-        self.hex_string = "------"
-        self.bin_string = "------------------------"
+        self.hex_string = INITIALIZATION_CHARACTER * self.NUMBER_OF_HEX_DIGITS
+        self.bin_string = INITIALIZATION_CHARACTER * self.NUMBER_OF_BIN_DIGITS
+
+    def initialize_register(self):
+        self.hex_string = INITIALIZATION_CHARACTER * self.NUMBER_OF_HEX_DIGITS
+        self.bin_string = INITIALIZATION_CHARACTER * self.NUMBER_OF_BIN_DIGITS
 
     def get_register_name(self):
         return self.register_name
@@ -30,10 +34,10 @@ class SICRegisterModel:
 
     def set_hex_string(self, hex_string):
         # Ensure all hex digits are uppercase and pad string with 0 if necessary
-        hex_string = hex_string.upper().rjust(NUMBER_OF_HEX_DIGITS, "0")
+        hex_string = hex_string.upper().rjust(self.NUMBER_OF_HEX_DIGITS, "0")
         # Error Check for length and hex digits
         error_found = False
-        if len(hex_string) != NUMBER_OF_HEX_DIGITS:
+        if len(hex_string) != self.NUMBER_OF_HEX_DIGITS:
             error_found = True
         for digit in hex_string:
             if digit not in HEX_TO_BIN_DICT:
@@ -58,10 +62,10 @@ class SICRegisterModel:
     # Set self.register_bin_string
     def set_bin_string(self, bin_string):
         # Pad bin string with 0 if necessary
-        bin_string.rjust(NUMBER_OF_BIN_DIGITS, "0")
+        bin_string.rjust(self.NUMBER_OF_BIN_DIGITS, "0")
         # Error Check for length and hex digits
         error_found = False
-        if len(bin_string) != NUMBER_OF_BIN_DIGITS:
+        if len(bin_string) != self.NUMBER_OF_BIN_DIGITS:
             error_found = True
         for digit in bin_string:
             if digit != "0" and digit != "1":
@@ -78,9 +82,11 @@ class SICRegisterModel:
         self.hex_string = self.bin_to_hex(bin_string)
 
     def get_bin_string(self):
+        self.bin_string = self.bin_string.replace(INITIALIZATION_CHARACTER, "1")
         return self.bin_string
 
     def get_hex_string(self):
+        self.hex_string = self.hex_string.replace(INITIALIZATION_CHARACTER, "F")
         return self.hex_string
 
     def get_formatted_bin_string(self):
@@ -127,6 +133,11 @@ def dump_registers():
                           "   BIN [" + register.get_formatted_bin_string() + "]\n")
 
     print(output_string)
+
+
+def initialize_registers():
+    for register_name, register in REGISTER_DICT.items():
+        register.initialize_register()
 
 # TEST BED
 # register_a = SICRegisterModel()

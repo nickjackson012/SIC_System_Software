@@ -15,7 +15,7 @@ LOOP2   ADD         TABLE,X
         TIX         COUNT
         JLT         LOOP2
         STA         TOTAL
-        RSUB
+        XOS
 TABLE   RESW        2000
 COUNT   WORD        9
 ZERO    WORD        0

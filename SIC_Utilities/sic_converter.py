@@ -7,7 +7,6 @@ class SICConverterError(Exception):
 
 
 def dec_to_hex_string(dec_value: int):
-
     if not isinstance(dec_value, int):
         raise SICConverterError("Cannot convert non-integer value passed to dec_to_hex_string function.")
 
@@ -26,6 +25,7 @@ def dec_to_hex_string(dec_value: int):
     for hex_digit in hex_digit_list:
         hex_string += hex_digit
     return hex_string
+
 
 # NOTE: Do we want to check for out of range and other errors?
 #       Do we want to read and write memory functions?
@@ -48,7 +48,6 @@ def dec_to_memory_address_hex_string(dec_value: int):
 
 
 def hex_string_to_dec(hex_string: str):
-
     if not isinstance(hex_string, str):
         raise SICConverterError("Cannot convert non-string value passed to hex_string_to_dec function.")
 

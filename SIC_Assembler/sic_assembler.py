@@ -2,6 +2,7 @@ import os
 import sys
 
 from SIC_Assembler.sic_configuration import SIC_DEFAULT_WORKING_DIRECTORY
+from SIC_Utilities import sic_integer
 from SIC_Utilities.sic_constants import MAXIMUM_MEMORY_ADDRESS_DEC, MAXIMUM_NUMBER_OF_LABELS, LOC_COLUMN_WIDTH, \
     LABEL_COLUMN_WIDTH, OPCODE_COLUMN_WIDTH, OPERAND_COLUMN_WIDTH, OBJECT_CODE_COLUMN_WIDTH, OPCODE_TO_HEX_DICT, \
     TO_INDEXED_ADDRESSING_DICT, OBJECT_CODE_TEXT_RECORD_BODY_LENGTH, SIC_ASSEMBLY_CODE_FILE_EXTENSION
@@ -151,7 +152,7 @@ def create_object_code_for_word(line_of_code_dict):
 
     operand = line_of_code_dict["operand"]
 
-    object_code = dec_to_hex_string(int(operand))
+    object_code = sic_integer.dec_to_hex_string(int(operand))
 
     # Pad object code with leading zeros if necessary
     while len(object_code) < OBJECT_CODE_LENGTH:
@@ -346,8 +347,9 @@ def assembler_pass_two(parsed_code_dict_list, assembly_code_file_path):
                 object_code_file.close()
                 assembly_listing_file.close()
                 # STATUS
-                print_status("Object code file written and closed", object_code_file_path)
-                print_status("Assembly listing file written and closed", assembly_listing_file_path)
+                print_status("Object code file written and closed")
+                print_status("Assembly listing file written and closed")
+                print_status("Pass two assembly complete")
 
                 return
             case _:
@@ -383,9 +385,6 @@ def assembler_pass_two(parsed_code_dict_list, assembly_code_file_path):
             object_code_text_record_header = create_object_code_text_record_header(
                 line_of_code_dict["location_counter"])
             object_code_text_record_body = object_code
-
-    # STATUS
-    print_status("Pass two assembly complete")
 
 
 # This function is used to verify the existence of an assembly program file(*.asm)
@@ -433,7 +432,7 @@ while True:
 
     program_file_path = ""
 
-    match command.upper():
+    match command.strip().upper():
         case "A":
             try:
                 print("Enter program file name")
@@ -453,7 +452,7 @@ while True:
             print(QUIT_CONFIRM)
             command = input(SICASM_PROMPT)
 
-            if command.upper() == "Y":
+            if command.strip().upper() == "Y":
                 sys.exit()
         case _:
             print(UNRECOGNIZED_COMMAND)

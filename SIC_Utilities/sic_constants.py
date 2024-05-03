@@ -8,6 +8,7 @@ BIN_TO_HEX_DICT = {"0000": "0", "0001": "1",
                    "1110": "E", "1111": "F"}
 
 BYTES_IN_MEMORY = 32768
+BYTES_IN_WORD = 3
 
 COMMENT_LINE_INDICATOR = "."
 
@@ -27,10 +28,14 @@ HEX_TO_BIN_DICT = {"0": "0000", "1": "0001",
 HEX_TO_DEC_DICT = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8,
                    "9": 9, "A": 10, "B": 11, "C": 12, "D": 13, "E": 14, "F": 15}
 
+INITIALIZATION_CHARACTER = "-"
+
 TO_INDEXED_ADDRESSING_DICT = {"0": "8", "1": "9", "2": "A", "3": "B", "4": "C", "5": "D", "6": "E", "7": "F"}
 FROM_INDEXED_ADDRESSING_DICT = {"8": "0", "9": "1", "A": "2", "B": "3", "C": "4", "D": "5", "E": "6", "F": "7"}
 
 LONE_OPCODE_VALIDATION_SET = {"RSUB", "END"}
+CUSTOM_LONE_OPCODE_VALIDATION_SET = {"XOS"}
+LONE_OPCODE_VALIDATION_SET.update(CUSTOM_LONE_OPCODE_VALIDATION_SET)
 
 MINIMUM_BYTE_OPERAND_LENGTH = 1
 MAXIMUM_BYTE_OPERAND_LENGTH = 32
@@ -60,13 +65,24 @@ NUMBER_OF_BITS_IN_A_INTEGER = 24
 OBJECT_CODE_TEXT_RECORD_BODY_LENGTH = 60
 
 OPCODE_TO_HEX_DICT = {"ADD": "18", "AND": "40", "COMP": "28", "DIV": "24", "J": "3C", "JEQ": "30",
-               "JGT": "34", "JLT": "38", "JSUB": "48", "LDA": "00", "LDCH": "50", "LDL": "08",
-               "LDX": "04", "MUL": "20", "OR": "44", "RD": "D8", "RSUB": "4C", "STA": "0C", "STCH": "54",
-               "STL": "14", "STSW": "E8", "STX": "10", "SUB": "1C", "TD": "E0", "TIX": "2C", "WD": "DC"}
+                      "JGT": "34", "JLT": "38", "JSUB": "48", "LDA": "00", "LDCH": "50", "LDL": "08",
+                      "LDX": "04", "MUL": "20", "OR": "44", "RD": "D8", "RSUB": "4C", "STA": "0C", "STCH": "54",
+                      "STL": "14", "STSW": "E8", "STX": "10", "SUB": "1C", "TD": "E0", "TIX": "2C", "WD": "DC"}
+CUSTOM_OPCODE_TO_HEX_DICT = {"XOS": "FF"}
+OPCODE_TO_HEX_DICT.update(CUSTOM_OPCODE_TO_HEX_DICT)
+
+HEX_TO_OPCODE_DICT = {"18": "ADD", "40": "AND", "28": "COMP", "24": "DIV", "3C": "J", "30": "JEQ",
+                      "34": "JGT", "38": "JLT", "48": "JSUB", "00": "LDA", "50": "LDCH", "08": "LDL",
+                      "04": "LDX", "20": "MUL", "44": "OR", "D8": "RD", "4C": "RSUB", "0C": "STA", "54": "STCH",
+                      "14": "STL", "E8": "STSW", "10": "STX", "1C": "SUB", "E0": "TD", "2C": "TIX", "DC": "WD"}
+CUSTOM_HEX_TO_OPCODE_DICT = {"FF": "XOS"}
+HEX_TO_OPCODE_DICT.update(CUSTOM_HEX_TO_OPCODE_DICT)
 
 OPCODE_VALIDATION_SET = {"ADD", "AND", "COMP", "DIV", "J", "JEQ", "JGT", "JLT", "JSUB", "LDA", "LDCH", "LDL",
                          "LDX", "MUL", "OR", "RD", "RSUB", "STA", "STCH", "STL", "STSW", "STX", "SUB",
                          "TD", "TIX", "WD", "START", "END", "BYTE", "WORD", "RESB", "RESW"}
+CUSTOM_OPCODE_VALIDATION_SET = {"XOS"}
+OPCODE_VALIDATION_SET.update(CUSTOM_OPCODE_VALIDATION_SET)
 
 LOC_COLUMN_WIDTH = 9
 LABEL_COLUMN_WIDTH = 10
@@ -78,4 +94,7 @@ SIC_ASSEMBLY_LISTING_FILE_EXTENSION = "lst"
 SIC_OBJECT_CODE_FILE_EXTENSION = "obj"
 SIC_ASSEMBLY_CODE_FILE_EXTENSION = "asm"
 
+SW_LESS_THAN = "00003C"
+SW_EQUAL = "00003D"
+SW_GREATER_THAN = "00003E"
 

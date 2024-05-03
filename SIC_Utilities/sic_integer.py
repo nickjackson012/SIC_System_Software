@@ -1,5 +1,6 @@
 # class SICConvert
-from SIC_Utilities.sic_constants import NUMBER_OF_BITS_IN_A_INTEGER, MINIMUM_INTEGER, MAXIMUM_INTEGER
+from SIC_Utilities.sic_constants import NUMBER_OF_BITS_IN_A_INTEGER, MINIMUM_INTEGER, MAXIMUM_INTEGER, HEX_TO_BIN_DICT, \
+    BIN_TO_HEX_DICT
 
 
 class SICIntegerError(Exception):
@@ -126,9 +127,37 @@ def dec_to_bin_string(dec_value: int):
 
     return binary_number_string
 
+
+def hex_to_bin(hex_string):
+    bin_string = ""
+    # Register holds 24 bits
+    # range(start, stop, step)
+    for hex_digit in hex_string:
+        bin_string += HEX_TO_BIN_DICT[hex_digit]
+    return bin_string
+
+
+def bin_to_hex(bin_string):
+    hex_string = ""
+    # Register holds 24 bits
+    # range(start, stop, step)
+    for index in range(0, 24, 4):
+        hex_string += BIN_TO_HEX_DICT[bin_string[index:index + 4]]
+    return hex_string
+
+
+def hex_string_to_dec(hex_string: str):
+    bin_string = hex_to_bin(hex_string)
+
+    return bin_string_to_dec(bin_string)
+
+
+def dec_to_hex_string(dec_value: int):
+    bin_string = dec_to_bin_string(dec_value)
+
+    return bin_to_hex(bin_string)
+
 # Test Bed
-
-
 # try:
 #     binary_value1 = dec_to_bin_string(-5592406)
 #     print("binary_value1", binary_value1)

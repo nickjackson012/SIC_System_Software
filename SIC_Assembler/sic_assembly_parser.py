@@ -315,7 +315,8 @@ def parse_assembly_code_file(assembly_code_file_path):
                 if has_label and number_of_parsed_tokens >= 3:
                     parsed_code_dict["label"] = validate_label(parsed_token_list[0])
                     parsed_code_dict["opcode"] = validate_opcode(parsed_token_list[1])
-                    if parsed_code_dict["opcode"] != "RSUB" and parsed_code_dict["opcode"] != "END":
+                    if (parsed_code_dict["opcode"] != "RSUB" and parsed_code_dict["opcode"] != "END"
+                            and parsed_code_dict["opcode"] != "XOS"):
                         parsed_code_dict["operand"] = validate_operand(parsed_token_list[2], parsed_token_list[1])
                         parsed_code_dict["indexed_addressing"] = test_for_index_addressing(parsed_token_list[2])
                 elif has_label and number_of_parsed_tokens >= 2:
@@ -323,7 +324,8 @@ def parse_assembly_code_file(assembly_code_file_path):
                     parsed_code_dict["opcode"] = validate_opcode(parsed_token_list[1])
                 elif not has_label and number_of_parsed_tokens >= 2:
                     parsed_code_dict["opcode"] = validate_opcode(parsed_token_list[0])
-                    if parsed_code_dict["opcode"] != "RSUB" and parsed_code_dict["opcode"] != "END":
+                    if (parsed_code_dict["opcode"] != "RSUB" and parsed_code_dict["opcode"] != "END"
+                            and parsed_code_dict["opcode"] != "XOS"):
                         parsed_code_dict["operand"] = validate_operand(parsed_token_list[1], parsed_token_list[0])
                         parsed_code_dict["indexed_addressing"] = test_for_index_addressing(parsed_token_list[1])
                 elif not has_label and number_of_parsed_tokens == 1:
