@@ -1,5 +1,10 @@
-from SIC_Utilities.sic_constants import BYTES_IN_MEMORY, INITIALIZATION_CHARACTER
+from SIC_Utilities.sic_constants import BYTES_IN_MEMORY, INITIALIZATION_CHARACTER, MINIMUM_MEMORY_ADDRESS_DEC, \
+    MAXIMUM_MEMORY_ADDRESS_DEC
 from SIC_Utilities.sic_converter import dec_to_memory_address_hex_string
+
+
+class SICMemoryModelError(Exception):
+    pass
 
 
 class SICMemoryModel:
@@ -12,28 +17,46 @@ class SICMemoryModel:
     def __init__(self):
         self.memory_model_dict = self.initialize_memory()
 
-    def get_byte(self, memory_address_dec: int):
-        byte_string = self.memory_model_dict[memory_address_dec]
+    def test_for_dec_memory_address_in_range(self, memory_address_dec_value: int):
+        is_in_memory_address_range = False
+
+        if MINIMUM_MEMORY_ADDRESS_DEC <= memory_address_dec_value <= MAXIMUM_MEMORY_ADDRESS_DEC:
+            is_in_memory_address_range = True
+        else:
+            # NOTE: Raise exception?
+            pass
+        return is_in_memory_address_range
+
+    def get_byte(self, memory_address_dec_value: int):
+        if not self.test_for_dec_memory_address_in_range(memory_address_dec_value):
+            raise SICMemoryModelError("Memory address out of range.")
+
+        byte_string = self.memory_model_dict[memory_address_dec_value]
         # Replace the initialization characters("-") encountered with "F".
         byte_string = byte_string.replace(INITIALIZATION_CHARACTER, "F")
 
         return byte_string
 
-    def get_bytes(self, memory_address_dec: int, number_of_bytes: int):
+    def get_bytes(self, memory_address_dec_value: int, number_of_bytes: int):
         byte_string = ""
         index = 0
 
         # Concatenate requested byte string
         while index < number_of_bytes:
-            byte_string += self.memory_model_dict[memory_address_dec + index]
+            if not self.test_for_dec_memory_address_in_range(memory_address_dec_value + index):
+                raise SICMemoryModelError("Memory address out of range.")
+            byte_string += self.memory_model_dict[memory_address_dec_value + index]
             index += 1
         # Replace the initialization characters("-") encountered with "F".
         byte_string = byte_string.replace(INITIALIZATION_CHARACTER, "F")
 
         return byte_string
 
-    def set_byte(self, memory_address_dec: int, byte_string: str):
-        self.memory_model_dict[memory_address_dec] = byte_string
+    def set_byte(self, memory_address_dec_value: int, byte_string: str):
+        if not self.test_for_dec_memory_address_in_range(memory_address_dec_value):
+            raise SICMemoryModelError("Memory address out of range.")
+
+        self.memory_model_dict[memory_address_dec_value] = byte_string
 
     def initialize_memory(self):
         # Create an empty dictionary to model memory

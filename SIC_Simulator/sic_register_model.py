@@ -1,7 +1,7 @@
 from SIC_Utilities.sic_constants import HEX_TO_BIN_DICT, BIN_TO_HEX_DICT, INITIALIZATION_CHARACTER
 
 
-class RegisterContentsError(Exception):
+class SICRegisterContentsError(Exception):
     pass
 
 
@@ -43,7 +43,7 @@ class SICRegisterModel:
             if digit not in HEX_TO_BIN_DICT:
                 error_found = True
         if error_found:
-            raise RegisterContentsError
+            raise SICRegisterContentsError
 
         # hex_string is okay, set the value
         self.hex_string = hex_string
@@ -72,7 +72,7 @@ class SICRegisterModel:
                 error_found = True
                 print("digit", digit)
         if error_found:
-            raise RegisterContentsError
+            raise SICRegisterContentsError
 
         # bin_string is okay, set the value
         self.bin_string = bin_string

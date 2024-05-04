@@ -1,5 +1,6 @@
 SIC_Assembler
 	sic_assembler
+	    SICAssemblerError(Exception)
 		get_byte_assembly_directive_byte_count(operand_string)
 		assembler_pass_one(parsed_code_dict_list)
 		format_assembly_listing_column(code_token, column_width)
@@ -13,6 +14,7 @@ SIC_Assembler
 		verify_program_file_path(program_file_name)
 		MAIN()
 	sic_assembly_parser
+	    SICAssemblyParserError(Exception)
 		test_for_comment_line(line_of_code)
 		test_for_label(line_of_code)
 		test_for_indexed_addressing(operand)
@@ -31,12 +33,15 @@ SIC_Assembler
 
 SIC_Simulator
 	sic_assembly_listing_parser
+	    SICAssemblyListingParserError(Exception)
 		sic_assembly_listing_parser(assembly_listing_file)
 		print_assembly_listing_line(parsed_assembly_listing_dict, register_pc)
 	sic_configuration
 	sic_loader
 		load_program_object_code(parsed_object_code_dict_list)
 	sic_memory_model
+	    SICMemoryModelError(Exception)
+	    test_for_dec_memory_address_in_range(self, memory_address_dec_value: int)
 		get_byte(self, memory_address_dec: int)
 		get_bytes(self, memory_address_dec: int, number_of_bytes: int)
 		set_byte(self, memory_address_dec: int, byte_string: str)
@@ -44,6 +49,7 @@ SIC_Simulator
 		dump_memory(self)
 		MEMORY_MODEL
 	sic_object_code_parser
+	    SICObjectCodeParserError(Exception)
 		parse_header_record(unparsed_line_of_object_code)
 		parse_text_record(unparsed_line_of_object_code)
 		parse_end_record(unparsed_line_of_object_code)
@@ -54,6 +60,7 @@ SIC_Simulator
 		create_indexed_address(memory_address_hex_string, REGISTER_DICT)
 		execute_operation(REGISTER_DICT, memory_model_dict)
 	sic_register_model
+	    SICRegisterContentsError(Exception)
 		initialize_register(self)
 		get_register_name(self)
 		get_formatted_register_name(self)
@@ -69,6 +76,7 @@ SIC_Simulator
 		dump_registers()
 		initialize_registers()
 	sic_simulator
+	    SICSimulatorError(Exception)
 		verify_and_open_program_files(program_file_name)
 		MAIN()
 	
@@ -117,11 +125,13 @@ SIC_Utilities
 		SW_EQUAL
 		SW_GREATER_THAN
 	sic_converter
+	    SICConverterError(Exception)
 		dec_to_hex_string(dec_value: int)
 		dec_to_memory_address_hex_string(dec_value: int)
 		hex_string_to_dec(hex_string: str)
 		test_for_hex(hex_string)
 	sic_integer
+	    SICIntegerError(Exception)
 		bin_string_to_dec(bin_value_string: str)
 		dec_to_bin_string(dec_value: int)
 		dec_to_hex_string(dec_value)
