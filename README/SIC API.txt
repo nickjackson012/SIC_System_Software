@@ -84,6 +84,7 @@ SIC_Utilities
 	sic_constants
 		COMMENT_LINE_INDICATOR
 		BYTES_IN_MEMORY
+		BITS_IN_WORD
 		BYTES_IN_WORD
 		BIN_TO_HEX_DICT
 		DEC_TO_HEX_DICT
@@ -130,6 +131,8 @@ SIC_Utilities
 		dec_to_memory_address_hex_string(dec_value: int)
 		hex_string_to_dec(hex_string: str)
 		test_for_hex(hex_string)
+		bin_word_to_hex_word(word_bin_string)
+		hex_word_to_bin_word(word_hex_string)
 	sic_integer
 	    SICIntegerError(Exception)
 		bin_string_to_dec(bin_value_string: str)

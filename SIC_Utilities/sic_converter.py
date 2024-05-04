@@ -1,5 +1,5 @@
 from SIC_Utilities.sic_constants import DEC_TO_HEX_DICT, MINIMUM_MEMORY_ADDRESS_DEC, MAXIMUM_MEMORY_ADDRESS_DEC, \
-    MEMORY_ADDRESS_STRING_LENGTH, HEX_TO_DEC_DICT, HEX_DIGIT_SET
+    MEMORY_ADDRESS_STRING_LENGTH, HEX_TO_DEC_DICT, HEX_DIGIT_SET, BIN_TO_HEX_DICT, HEX_TO_BIN_DICT, BITS_IN_WORD
 
 
 class SICConverterError(Exception):
@@ -72,3 +72,23 @@ def test_for_hex(hex_string):
             return False
 
     return True
+
+
+def bin_word_to_hex_word(bin_word_string):
+    hex_word_string = ""
+    # Register holds 24 bits
+    bin_word_string = bin_word_string.rjust(BITS_IN_WORD, "0")
+    # range(start, stop, step)
+    for index in range(0, BITS_IN_WORD, 4):
+        hex_word_string += BIN_TO_HEX_DICT[bin_word_string[index:index + 4]]
+    return hex_word_string
+
+
+def hex_word_to_bin_word(hex_word_string):
+    bin_word_string = ""
+    # Register holds 24 bits
+    hex_word_string = hex_word_string.rjust(6, "0")
+    # range(start, stop, step)
+    for hex_digit in hex_word_string:
+        bin_word_string += HEX_TO_BIN_DICT[hex_digit]
+    return bin_word_string

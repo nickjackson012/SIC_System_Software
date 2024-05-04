@@ -8,6 +8,7 @@ BIN_TO_HEX_DICT = {"0000": "0", "0001": "1",
                    "1110": "E", "1111": "F"}
 
 BYTES_IN_MEMORY = 32768
+BITS_IN_WORD = 24
 BYTES_IN_WORD = 3
 
 COMMENT_LINE_INDICATOR = "."
