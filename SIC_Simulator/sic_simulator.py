@@ -1,6 +1,7 @@
 import os
 import sys
 
+from SIC_Peripherals.sic_output_device_05 import initialize_output_device_05
 from SIC_Simulator.sic_assembly_listing_parser import sic_assembly_listing_parser, print_assembly_listing_line
 from SIC_Simulator.sic_configuration import SIC_DEFAULT_WORKING_DIRECTORY
 from SIC_Simulator.sic_loader import load_program_object_code
@@ -112,6 +113,9 @@ while True:
                     # Initialize the program counter register
                     header_record_dict = parsed_object_code_dict_list[0]
                     REGISTER_DICT[REGISTER_PC].set_hex_string(header_record_dict["program_start_address"])
+
+                    # Initialize output peripheral
+                    initialize_output_device_05()
 
                     # STATUS
                     print_status(program_file_name + " loaded and ready to run")

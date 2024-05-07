@@ -31,6 +31,15 @@ SIC_Assembler
 		parse_assembly_code_file(assembly_code_file_path)
 	sic_configuration
 
+SIC_Peripherals
+    sic_input_device_F1
+        read_byte_input_device_F1(is_in_EOF_state: bool)
+        test_input_device_F1()
+    sic_output_device_05
+        initialize_output_device_05()
+        test_output_device_05()
+        write_byte_to_output_device_05(byte_string: str)
+
 SIC_Simulator
 	sic_assembly_listing_parser
 	    SICAssemblyListingParserError(Exception)

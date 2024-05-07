@@ -83,10 +83,12 @@ class SICRegisterModel:
 
     def get_bin_string(self):
         self.bin_string = self.bin_string.replace(INITIALIZATION_CHARACTER, "1")
+        self.hex_string = self.hex_string.replace(INITIALIZATION_CHARACTER, "F")
         return self.bin_string
 
     def get_hex_string(self):
         self.hex_string = self.hex_string.replace(INITIALIZATION_CHARACTER, "F")
+        self.bin_string = self.bin_string.replace(INITIALIZATION_CHARACTER, "1")
         return self.hex_string
 
     def get_formatted_bin_string(self):

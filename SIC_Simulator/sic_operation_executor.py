@@ -1,5 +1,7 @@
 import random
 
+from SIC_Peripherals.sic_input_device_F1 import read_byte_input_device_F1, test_input_device_F1
+from SIC_Peripherals.sic_output_device_05 import test_output_device_05, write_byte_to_output_device_05
 from SIC_Simulator.sic_memory_model import SICMemoryModelError
 from SIC_Simulator.sic_register_model import REGISTER_DICT, REGISTER_A, REGISTER_PC, REGISTER_X, REGISTER_SW, REGISTER_L
 from SIC_Utilities import sic_integer
@@ -374,7 +376,21 @@ def execute_operation(REGISTER_DICT, MEMORY_MODEL):
             return continue_execution
         case "RD":
             # A[rightmost byte] <- data from device specified by (m)
-            pass
+            register_a_hex_string = REGISTER_DICT[REGISTER_A].get_hex_string()
+            register_x_hex_string = REGISTER_DICT[REGISTER_X].get_hex_string()
+
+            is_in_EOF_state = False
+            if register_a_hex_string == "000000" and register_x_hex_string == "000000":
+                is_in_EOF_state = True
+
+            byte_string = read_byte_input_device_F1(is_in_EOF_state)
+
+            register_a_hex_string = register_a_hex_string[:4] + byte_string
+
+            REGISTER_DICT[REGISTER_A].set_hex_string(register_a_hex_string)
+
+            continue_execution = True
+            return continue_execution
         case "RSUB":
             # PC <- L
             register_l_hex_string = REGISTER_DICT[REGISTER_L].get_hex_string()
@@ -516,10 +532,23 @@ def execute_operation(REGISTER_DICT, MEMORY_MODEL):
             return continue_execution
         case "TD":
             # Test device specified by (m)
-            # Simulate testing a device by randomly selecting READY(SW_LESS_THAN) or NOT READY(SW_EQUAL)
-            # The "randomization" will be weighted to favor NOT READY
-            test_device_response_list = [SW_EQUAL, SW_EQUAL, SW_LESS_THAN]
-            test_device_response_hex_string = random.choice(test_device_response_list)
+            # Determine which device is being tested
+            try:
+                byte_string = MEMORY_MODEL.get_byte(memory_address_dec_value)
+            except SICMemoryModelError:
+                print_error("MEMORY FAULT: Halting program execution\n")
+                continue_execution = False
+                return continue_execution
+
+            match byte_string:
+                case "05":
+                    test_device_response_hex_string = test_output_device_05()
+                case "F1":
+                    test_device_response_hex_string = test_input_device_F1()
+                case _:
+                    print_error("PERIPHERAL DEVICE FAULT: Halting program execution\n")
+                    continue_execution = False
+                    return continue_execution
 
             # Set register SW to the response from the randomization
             REGISTER_DICT[REGISTER_SW].set_hex_string(test_device_response_hex_string)
@@ -552,7 +581,12 @@ def execute_operation(REGISTER_DICT, MEMORY_MODEL):
             return continue_execution
         case "WD":
             # Device specified by (m) <- (A)[rightmost byte]
-            pass
+            register_a_hex_string = REGISTER_DICT[REGISTER_A].get_hex_string()
+            byte_string = register_a_hex_string[4:]
+            write_byte_to_output_device_05(byte_string)
+
+            continue_execution = True
+            return continue_execution
         case "XOS":
             # End processing and exit to the operating system
             print_status("Program execution terminated normally\n")
