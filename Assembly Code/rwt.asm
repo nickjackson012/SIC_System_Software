@@ -1,3 +1,5 @@
+. Based on ReadWrite.asm (pg. 45)
+. Used to test the SIC simulator with a shorter file name
 .LABEL	OPCODE	OPERAND		REMARKS
 COPY	START	1000			COPY FILE FROM INPUT TO OUTPUT
 FIRST	STL		RETADR			SAVE RETURN ADDRESS

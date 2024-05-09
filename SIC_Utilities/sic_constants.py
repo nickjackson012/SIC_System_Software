@@ -69,20 +69,20 @@ OPCODE_TO_HEX_DICT = {"ADD": "18", "AND": "40", "COMP": "28", "DIV": "24", "J": 
                       "JGT": "34", "JLT": "38", "JSUB": "48", "LDA": "00", "LDCH": "50", "LDL": "08",
                       "LDX": "04", "MUL": "20", "OR": "44", "RD": "D8", "RSUB": "4C", "STA": "0C", "STCH": "54",
                       "STL": "14", "STSW": "E8", "STX": "10", "SUB": "1C", "TD": "E0", "TIX": "2C", "WD": "DC"}
-CUSTOM_OPCODE_TO_HEX_DICT = {"XOS": "FF", "TXB": "FE", "TXW": "FD"}
+CUSTOM_OPCODE_TO_HEX_DICT = {"XOS": "FF", "TIXB": "FE", "TIXW": "FD"}
 OPCODE_TO_HEX_DICT.update(CUSTOM_OPCODE_TO_HEX_DICT)
 
 HEX_TO_OPCODE_DICT = {"18": "ADD", "40": "AND", "28": "COMP", "24": "DIV", "3C": "J", "30": "JEQ",
                       "34": "JGT", "38": "JLT", "48": "JSUB", "00": "LDA", "50": "LDCH", "08": "LDL",
                       "04": "LDX", "20": "MUL", "44": "OR", "D8": "RD", "4C": "RSUB", "0C": "STA", "54": "STCH",
                       "14": "STL", "E8": "STSW", "10": "STX", "1C": "SUB", "E0": "TD", "2C": "TIX", "DC": "WD"}
-CUSTOM_HEX_TO_OPCODE_DICT = {"FF": "XOS", "FE": "TXB", "FD": "TXW"}
+CUSTOM_HEX_TO_OPCODE_DICT = {"FF": "XOS", "FE": "TIXB", "FD": "TIXW"}
 HEX_TO_OPCODE_DICT.update(CUSTOM_HEX_TO_OPCODE_DICT)
 
 OPCODE_VALIDATION_SET = {"ADD", "AND", "COMP", "DIV", "J", "JEQ", "JGT", "JLT", "JSUB", "LDA", "LDCH", "LDL",
                          "LDX", "MUL", "OR", "RD", "RSUB", "STA", "STCH", "STL", "STSW", "STX", "SUB",
                          "TD", "TIX", "WD", "START", "END", "BYTE", "WORD", "RESB", "RESW"}
-CUSTOM_OPCODE_VALIDATION_SET = {"XOS", "TXB", "TXW"}
+CUSTOM_OPCODE_VALIDATION_SET = {"XOS", "TIXB", "TIXW"}
 OPCODE_VALIDATION_SET.update(CUSTOM_OPCODE_VALIDATION_SET)
 
 LOC_COLUMN_WIDTH = 9

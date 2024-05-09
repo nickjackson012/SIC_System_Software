@@ -28,6 +28,8 @@ SIC_Assembler
 		validate_resw_operand(operand)
 		validate_nonspecific_operand(operand)
 		validate_operand(operand, opcode)
+		get_byte_character_string(line_of_code)
+		handle_byte_character_string(parsed_token_list, byte_character_string)
 		parse_assembly_code_file(assembly_code_file_path)
 	sic_configuration
 

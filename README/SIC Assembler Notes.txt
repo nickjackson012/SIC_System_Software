@@ -26,11 +26,11 @@ STX m			10			m..m+2 <- (X)
 SUB m			1C			A <- (A) - (m..m+2)
 TD m			E0			Test device specified by (m)
 TIX m			2C			X <- (X) + 1; (X):(m..m+2)
-TXB             FE          X <- (X) + 1; (X):(m..m+2)
-TXW             FD          X <- (X) + 1; (X):((m..m+2) * 3)
 WD m			DC			Device specified by (m) <- (A)[rightmost byte]
 ==================================================
 XOS				FF			Exit to the operating system
+TIXB            FE          X <- (X) + 1; (X):(m..m+2)
+TIXW            FD          X <- (X) + 1; (X):((m..m+2) * 3)
 
 
 ASSEMBLER DIRECTIVES Page 44

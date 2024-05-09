@@ -1,4 +1,8 @@
-SUMMOD     START       4000
+. Based on example assembly code from pg. 111
+. Exercise 2 in Chapter 2
+. Fixes problems in Sum.asm
+. Tests our custom opcode: XOS
+SUMMOD  START       4000
 FIRST   LDX         ZERO
         LDA         ONE
 LOOP1   MUL         COUNT

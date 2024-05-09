@@ -1,3 +1,6 @@
+. Example assembly code from pg. 111
+. Exercise 2 in Chapter 2
+. Code does not work due to table has no data and TIX indexes bytes not integers(words)
 SUM     START       4000
 FIRST   LDX         ZERO
         LDA         ZERO

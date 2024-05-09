@@ -579,9 +579,10 @@ def execute_operation(REGISTER_DICT, MEMORY_MODEL):
 
             continue_execution = True
             return continue_execution
-        case "TXB":
+        case "TIXB":
             # X <- (X) + 1; (X):(m..m+2)
             # Increment the value in the X register by 1
+            # NOTE: This function is identical to TIX
             register_x_dec_value = hex_string_to_dec(REGISTER_DICT[REGISTER_X].get_hex_string()) + 1
             register_x_hex_string = dec_to_hex_string(register_x_dec_value)
             REGISTER_DICT[REGISTER_X].set_hex_string(register_x_hex_string)
@@ -604,7 +605,7 @@ def execute_operation(REGISTER_DICT, MEMORY_MODEL):
             continue_execution = True
             return continue_execution
 
-        case "TXW":
+        case "TIXW":
             # X <- (X) + 3; (X):((m..m+2) * 3)
             # Increment the value in the X register by 3
             register_x_dec_value = hex_string_to_dec(REGISTER_DICT[REGISTER_X].get_hex_string()) + 3
