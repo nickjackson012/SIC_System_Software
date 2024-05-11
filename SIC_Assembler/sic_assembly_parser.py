@@ -1,12 +1,11 @@
 import os
-import sys
 
 from SIC_Utilities.sic_constants import COMMENT_LINE_INDICATOR, MINIMUM_MEMORY_ADDRESS_DEC, MAXIMUM_MEMORY_ADDRESS_DEC, \
     OPCODE_VALIDATION_SET, LONE_OPCODE_VALIDATION_SET, MAXIMUM_LENGTH_OF_START_OPERAND, MINIMUM_BYTE_OPERAND_LENGTH, \
     MAXIMUM_BYTE_OPERAND_LENGTH, HEX_DIGIT_SET, MINIMUM_INTEGER, MAXIMUM_INTEGER, MINIMUM_RESB, MAXIMUM_RESB, \
     MINIMUM_RESW, MAXIMUM_RESW, MAXIMUM_LENGTH_OF_OPERAND
 from SIC_Utilities.sic_converter import hex_string_to_dec, SICConverterError
-from SIC_Utilities.sic_messaging import print_status, print_error
+from SIC_Utilities.sic_messaging import print_status
 
 
 class SICAssemblyParserError(Exception):
@@ -111,6 +110,9 @@ def validate_start_operand(operand):
 #    3A.) If operand is a character string it must be formed as such "C'aaaa...'" (a = valid ascii character)
 #    3B.) The character string must contain an even number of characters and must be  1-32 characters in length.
 def validate_byte_operand(operand):
+    if len(operand) < 4:
+        raise SICAssemblyParserError("Invalid BYTE OPERAND")
+
     if operand[1] == "'" and operand[-1] == "'":
         if len(operand[2:-1]) < MINIMUM_BYTE_OPERAND_LENGTH or len(operand[2:-1]) > MAXIMUM_BYTE_OPERAND_LENGTH:
             raise SICAssemblyParserError("OPERAND must have 1-32 characters between the quotation marks.")
@@ -171,7 +173,7 @@ def validate_resb_operand(operand):
     if MINIMUM_RESB <= resb_value <= MAXIMUM_RESB:
         return operand
     else:
-        raise SICAssemblyParserError("RESB operand can be no larger than 32768")
+        raise SICAssemblyParserError("RESB operand must be between 0 and 32768")
 
 
 # This function validates the RESW operand.
@@ -189,7 +191,7 @@ def validate_resw_operand(operand):
     if MINIMUM_RESW <= resw_value <= MAXIMUM_RESW:
         return operand
     else:
-        raise SICAssemblyParserError("RESW operand must be no larger than 10,922")
+        raise SICAssemblyParserError("RESW operand must be between 0 and 10,922")
 
 
 # This function validates the operand for all other opcodes.
@@ -203,7 +205,7 @@ def validate_nonspecific_operand(operand):
     # Check for indexed addressing indicator and remove indicator from operand.
     if operand[-2:] == ",X":
         operand = operand[:-2]
-    if operand[0].isalpha:
+    if operand[0].isalpha():
         # Operand will be validated as label.
         characters_valid = operand.isupper() and operand.isalnum()
         length_valid = 0 < len(operand) <= 6
@@ -256,6 +258,42 @@ def validate_operand(operand, opcode):
             return validate_nonspecific_operand(operand)
 
 
+# This function parses and returns a BYTE character string if one exists in the line of code.
+# Otherwise, it returns None
+def get_byte_character_string(line_of_code):
+    byte_character_string = None
+    start_index = line_of_code.find("C'")
+    if start_index != -1:
+        byte_character_string = line_of_code[start_index + 2:]
+        end_index = byte_character_string.find("'")
+        if end_index != -1:
+            byte_character_string = byte_character_string[:end_index]
+
+            byte_character_string = "C'" + byte_character_string + "'"
+
+    return byte_character_string
+
+
+# This function handles BYTE character strings.
+# This special handling is required when there are spaces in the byte character string that would be tokenized.
+def handle_byte_character_string(parsed_token_list, byte_character_string):
+    parsed_token_list_length = len(parsed_token_list)
+    try:
+        byte_opcode_index = parsed_token_list.index("BYTE")
+
+        if byte_opcode_index == 0 and parsed_token_list_length >= 2:
+            exists_index = parsed_token_list[byte_opcode_index + 1].find("C'")
+            if exists_index != -1:
+                parsed_token_list = [parsed_token_list[0], byte_character_string]
+
+        elif byte_opcode_index == 1 and parsed_token_list_length >= 3:
+            exists_index = parsed_token_list[byte_opcode_index + 1].find("C'")
+            if exists_index != -1:
+                parsed_token_list = [parsed_token_list[0], parsed_token_list[1], byte_character_string]
+    except ValueError:
+        pass
+
+    return parsed_token_list
 # This function opens and reads an assembly code file (*.asm).
 # It processes each line of code one at a time
 # It parses out all the relevant assembly code tokens and stores them in a line of code dictionary.
@@ -290,10 +328,9 @@ def parse_assembly_code_file(assembly_code_file_path):
                 # Close assembly file, print error message, and exit program.
                 assembly_code_file.close()
                 # ERROR
-                print_error("SIC Assembly Parser Error: Line is blank. Line must contain code or comment",
-                            "LINE" + str(line_of_code_number) + ": " + unparsed_line_of_code)
-
-                sys.exit()
+                raise SICAssemblyParserError("Parser Error: Line is blank. Line must contain code or comment" + "\n" +
+                                             "LINE" + str(line_of_code_number) +
+                                             ": " + unparsed_line_of_code)
 
             # Determine if line of code is a comment line
             is_comment_line = test_for_comment_line(line_of_code)
@@ -306,7 +343,12 @@ def parse_assembly_code_file(assembly_code_file_path):
             # Determine if line contains a LABEL
             has_label = test_for_label(line_of_code)
 
+            # Handle BYTE character strings,
+            # Parse out expected code tokens and count the amount of tokens
+            byte_character_string = get_byte_character_string(line_of_code)
             parsed_token_list = line_of_code.split()
+            if byte_character_string is not None:
+                parsed_token_list = handle_byte_character_string(parsed_token_list, byte_character_string)
             number_of_parsed_tokens = len(parsed_token_list)
 
             # Initialize all indexed_addressing flags to False
@@ -317,7 +359,8 @@ def parse_assembly_code_file(assembly_code_file_path):
                 if has_label and number_of_parsed_tokens >= 3:
                     parsed_code_dict["label"] = validate_label(parsed_token_list[0])
                     parsed_code_dict["opcode"] = validate_opcode(parsed_token_list[1])
-                    if parsed_code_dict["opcode"] != "RSUB" and parsed_code_dict["opcode"] != "END":
+                    if (parsed_code_dict["opcode"] != "RSUB" and parsed_code_dict["opcode"] != "END"
+                            and parsed_code_dict["opcode"] != "XOS"):
                         parsed_code_dict["operand"] = validate_operand(parsed_token_list[2], parsed_token_list[1])
                         parsed_code_dict["indexed_addressing"] = test_for_index_addressing(parsed_token_list[2])
                 elif has_label and number_of_parsed_tokens >= 2:
@@ -325,7 +368,8 @@ def parse_assembly_code_file(assembly_code_file_path):
                     parsed_code_dict["opcode"] = validate_opcode(parsed_token_list[1])
                 elif not has_label and number_of_parsed_tokens >= 2:
                     parsed_code_dict["opcode"] = validate_opcode(parsed_token_list[0])
-                    if parsed_code_dict["opcode"] != "RSUB" and parsed_code_dict["opcode"] != "END":
+                    if (parsed_code_dict["opcode"] != "RSUB" and parsed_code_dict["opcode"] != "END"
+                            and parsed_code_dict["opcode"] != "XOS"):
                         parsed_code_dict["operand"] = validate_operand(parsed_token_list[1], parsed_token_list[0])
                         parsed_code_dict["indexed_addressing"] = test_for_index_addressing(parsed_token_list[1])
                 elif not has_label and number_of_parsed_tokens == 1:
@@ -337,10 +381,9 @@ def parse_assembly_code_file(assembly_code_file_path):
                 # Close assembly file, print error message, and exit program.
                 assembly_code_file.close()
                 # ERROR
-                print_error("SIC Assembly Parser Error: " + str(ex),
-                            "LINE " + str(line_of_code_number) + ": " + unparsed_line_of_code)
-
-                sys.exit()
+                raise SICAssemblyParserError("Parser Error: " + str(ex) + "\n" +
+                                             "LINE " + str(line_of_code_number) +
+                                             ": " + unparsed_line_of_code)
 
             parsed_code_dict["comment"] = False
 
@@ -352,10 +395,10 @@ def parse_assembly_code_file(assembly_code_file_path):
                     # Close assembly file, print error message, and exit program.
                     assembly_code_file.close()
                     # ERROR
-                    print_error("SIC Assembly Parser Error: START must be the first opcode called in assembly program.",
-                                "LINE " + str(line_of_code_number) + ": " + unparsed_line_of_code)
-
-                    sys.exit()
+                    raise SICAssemblyParserError("Parser Error: START must be the first opcode called in assembly "
+                                                 + "program\n" +
+                                                 "LINE " + str(line_of_code_number) +
+                                                 ": " + unparsed_line_of_code)
 
             parsed_code_dict["unparsed_line_of_code"] = unparsed_line_of_code
 
@@ -377,20 +420,18 @@ def parse_assembly_code_file(assembly_code_file_path):
             print_status("Parsing complete")
         else:
             # if END assembly directive is not found, then assembly code is invalid and error is raised.
+            assembly_code_file.close()
             # ERROR
-            print_error("SIC Assembly Parser Error: No END assembly directive found.")
-
-            sys.exit()
+            raise SICAssemblyParserError("Parser Error: No END assembly directive found.")
 
         return parsed_code_dict_list
 
     else:
         # ERROR
-        print_error("SIC assembly code file does not exist.", assembly_code_file_path)
-
-        sys.exit()
+        raise SICAssemblyParserError("SIC assembly code file does not exist." + "\n" + assembly_code_file_path)
 
 
+# TEST BED
 # Create path to assembly code file
 # NOTE: This is just temporary.
 # File should be indicated at run time.

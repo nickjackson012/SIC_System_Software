@@ -1,11 +1,14 @@
+import os
 import sys
 
+from SIC_Assembler.sic_configuration import SIC_DEFAULT_WORKING_DIRECTORY
+from SIC_Utilities import sic_integer
 from SIC_Utilities.sic_constants import MAXIMUM_MEMORY_ADDRESS_DEC, MAXIMUM_NUMBER_OF_LABELS, LOC_COLUMN_WIDTH, \
     LABEL_COLUMN_WIDTH, OPCODE_COLUMN_WIDTH, OPERAND_COLUMN_WIDTH, OBJECT_CODE_COLUMN_WIDTH, OPCODE_TO_HEX_DICT, \
-    TO_INDEXED_ADDRESSING_DICT, OBJECT_CODE_TEXT_RECORD_BODY_LENGTH
+    TO_INDEXED_ADDRESSING_DICT, OBJECT_CODE_TEXT_RECORD_BODY_LENGTH, SIC_ASSEMBLY_CODE_FILE_EXTENSION
 from SIC_Utilities.sic_converter import hex_string_to_dec, dec_to_memory_address_hex_string, dec_to_hex_string
 from SIC_Utilities.sic_messaging import print_status, print_error
-from sic_assembly_parser import parse_assembly_code_file
+from sic_assembly_parser import parse_assembly_code_file, SICAssemblyParserError
 
 # GLOBALS
 label_dict = {}
@@ -32,6 +35,11 @@ def assembler_pass_one(parsed_code_dict_list):
     # ASSEMBLER PASS ONE
     # STATUS
     print_status("Beginning pass one assembly")
+
+    # Initialize the label dictionary
+    global label_dict
+    label_dict = {}
+
     location_counter_dec = 0
     start_address_dec = location_counter_dec
 
@@ -59,16 +67,14 @@ def assembler_pass_one(parsed_code_dict_list):
                     # NOTE: Check for size. 500 maximum
                     else:
                         # ERROR
-                        print_error("Maximum number of labels exceeded.", "LINE" +
-                                    str(line_of_code_dict["line_number"]) + ": "
-                                    + line_of_code_dict["unparsed_line_of_code"])
+                        raise SICAssemblerError("Maximum number of LABELS exceeded\n" +
+                                                "LINE" + str(line_of_code_dict["line_number"]) + ": "
+                                                + line_of_code_dict["unparsed_line_of_code"])
                 else:
                     # ERROR
-                    print_error("Duplicate label found.", "LINE" +
-                                str(line_of_code_dict["line_number"]) + ": "
-                                + line_of_code_dict["unparsed_line_of_code"])
-            # # handle opcode
-            # opcode = line_of_code_dict["opcode"]
+                    raise SICAssemblerError("Duplicate label found.\n" +
+                                            "LINE" + str(line_of_code_dict["line_number"]) + ": "
+                                            + line_of_code_dict["unparsed_line_of_code"])
 
             line_of_code_dict["location_counter"] = dec_to_memory_address_hex_string(
                 location_counter_dec)
@@ -96,14 +102,11 @@ def assembler_pass_one(parsed_code_dict_list):
 
             if location_counter_dec > MAXIMUM_MEMORY_ADDRESS_DEC:
                 # ERROR
-                print_error("Location counter out of range.", "LINE" +
-                            str(line_of_code_dict["line_number"]) + ": "
-                            + line_of_code_dict["unparsed_line_of_code"])
+                raise SICAssemblerError("Location counter out of range\n" +
+                                        "LINE" + str(line_of_code_dict["line_number"]) + ": "
+                                        + line_of_code_dict["unparsed_line_of_code"])
 
-                sys.exit()
-
-            # TESTING:
-
+            # DEBUG:
             # print(line_of_code_dict)
 
     # DEBUG:
@@ -149,7 +152,7 @@ def create_object_code_for_word(line_of_code_dict):
 
     operand = line_of_code_dict["operand"]
 
-    object_code = dec_to_hex_string(int(operand))
+    object_code = sic_integer.dec_to_hex_string(int(operand))
 
     # Pad object code with leading zeros if necessary
     while len(object_code) < OBJECT_CODE_LENGTH:
@@ -269,7 +272,7 @@ def assembler_pass_two(parsed_code_dict_list, assembly_code_file_path):
 
     for line_of_code_dict in parsed_code_dict_list:
         # DEBUG
-        print(line_of_code_dict)
+        # print(line_of_code_dict)
         # Initialize object code
         object_code = ""
         # Handle the various opcodes and generate object code
@@ -331,9 +334,11 @@ def assembler_pass_two(parsed_code_dict_list, assembly_code_file_path):
                 # Create and write assembly listing line
                 assembly_listing_line = create_assembly_listing_line(line_of_code_dict)
                 assembly_listing_file.write(assembly_listing_line)
-                # Create object code end record and write to object code file
-                object_code_file.write(create_object_code_text_record(object_code_text_record_header,
-                                                                      object_code_text_record_body))
+                # Write the last text record to the object code if it exists
+                if object_code_text_record_header != "":
+                    object_code_file.write(create_object_code_text_record(object_code_text_record_header,
+                                                                          object_code_text_record_body))
+                # Create object code end record
                 object_code_end_record = ("E" + start_address_hex.rjust(6, "0") + "\n")
 
                 object_code_file.write(object_code_end_record)
@@ -342,8 +347,11 @@ def assembler_pass_two(parsed_code_dict_list, assembly_code_file_path):
                 object_code_file.close()
                 assembly_listing_file.close()
                 # STATUS
-                print_status("Object code file written and closed", object_code_file_path)
-                print_status("Assembly listing file written and closed", assembly_listing_file_path)
+                print_status("Object code file written and closed")
+                print_status("Assembly listing file written and closed")
+                print_status("Pass two assembly complete")
+
+                return
             case _:
                 # Create object code for all other opcodes and add to line of code dict
                 try:
@@ -354,10 +362,9 @@ def assembler_pass_two(parsed_code_dict_list, assembly_code_file_path):
                     object_code_file.close()
                     assembly_listing_file.close()
                     # ERROR
-                    print_error(str(ex),
-                                "LINE " + str(line_of_code_dict["line_number"]) + ": "
-                                + line_of_code_dict["unparsed_line_of_code"])
-                    sys.exit()
+                    raise SICAssemblerError(str(ex) + "\n" +
+                                            "LINE " + str(line_of_code_dict["line_number"]) + ": "
+                                            + line_of_code_dict["unparsed_line_of_code"])
                 # Create and write assembly listing line
                 assembly_listing_line = create_assembly_listing_line(line_of_code_dict)
                 assembly_listing_file.write(assembly_listing_line)
@@ -379,24 +386,91 @@ def assembler_pass_two(parsed_code_dict_list, assembly_code_file_path):
                 line_of_code_dict["location_counter"])
             object_code_text_record_body = object_code
 
-    # STATUS
-    print_status("Pass two assembly complete")
+
+# This function is used to verify the existence of an assembly program file(*.asm)
+def verify_program_file_path(program_file_name):
+    assembly_code_file_name = "." + SIC_ASSEMBLY_CODE_FILE_EXTENSION
+    # Check if file extension is present in file name
+    # Verify that the file extension matches SIC_ASSEMBLY_CODE_FILE_EXTENSION
+    token_list = program_file_name.split(".")
+    if len(token_list) == 1:
+        assembly_code_file_name = token_list[0].strip() + assembly_code_file_name
+    elif len(token_list) == 2:
+        if token_list[1].strip() == SIC_ASSEMBLY_CODE_FILE_EXTENSION:
+            assembly_code_file_name = token_list[0].strip() + assembly_code_file_name
+
+        else:
+            raise SICAssemblerError("Invalid file extension")
+    else:
+        raise SICAssemblerError("Invalid file name")
+
+    # Build a full file path using the configured default working directory
+    assembly_code_file_path = SIC_DEFAULT_WORKING_DIRECTORY + assembly_code_file_name
+
+    # check to see if the file exists
+    if os.path.exists(assembly_code_file_path):
+        return assembly_code_file_path
+    else:
+        raise SICAssemblerError("Assembly code file does not exist\n" + assembly_code_file_path)
 
 
+##############################
+# SIC ASSEMBLER USER INTERFACE
+##############################
+
+
+SICASM_PROMPT = "SICASM> "
+ASSEMBLE_MENU = "(a)ssemble, (q)uit"
+QUIT_CONFIRM = "Are you sure you want to quit? (y)es, (n)o"
+UNRECOGNIZED_COMMAND = "Unrecognized command"
+
+print("SIC ASSEMBLER")
+
+while True:
+    print(ASSEMBLE_MENU)
+    command = input(SICASM_PROMPT)
+
+    program_file_path = ""
+
+    match command.strip().upper():
+        case "A":
+            try:
+                print("Enter program file name")
+                program_file_name = input(SICASM_PROMPT)
+
+                # Verify program file path
+                program_file_path = verify_program_file_path(program_file_name)
+                # Parse assembly code
+                parsed_code_dict_list = parse_assembly_code_file(program_file_path)
+                # Execute pass one and pass two assembly
+                assembler_pass_one(parsed_code_dict_list)
+                assembler_pass_two(parsed_code_dict_list, program_file_path)
+            except (SICAssemblyParserError, SICAssemblerError) as ex:
+                # ERROR
+                print_error(str(ex))
+        case "Q":
+            print(QUIT_CONFIRM)
+            command = input(SICASM_PROMPT)
+
+            if command.strip().upper() == "Y":
+                sys.exit()
+        case _:
+            print(UNRECOGNIZED_COMMAND)
+
+# TEST BED
 # Create path to assembly code file
 # NOTE: This is just temporary.
 # File should be indicated at run time.
 # assembly_code_file_name = "ReadWrite.asm"
-
-
-assembly_code_file_name = "ReadWrite.asm"
 # assembly_code_file_name = "ReadWriteTest02.asm"
-assembly_code_file_path = ("/Users/nickjackson012/Desktop/Pycharm Projects/SIC_System_Software/Assembly Code/" + assembly_code_file_name)
-
-parsed_code_dict_list = parse_assembly_code_file(assembly_code_file_path)
-
-assembler_pass_one(parsed_code_dict_list)
-
-assembler_pass_two(parsed_code_dict_list, assembly_code_file_path)
+# assembly_code_file_name = "Sum.asm"
+# assembly_code_file_name = "SumModified.asm"
+# assembly_code_file_path = ("/Users/nickjackson/Desktop/Pycharm Projects/SIC_System_Software/Assembly Code/"
+#                             + assembly_code_file_name)
+# parsed_code_dict_list = parse_assembly_code_file(assembly_code_file_path)
+#
+# assembler_pass_one(parsed_code_dict_list)
+#
+# assembler_pass_two(parsed_code_dict_list, assembly_code_file_path)
 
 # print("label_dict: ", label_dict)

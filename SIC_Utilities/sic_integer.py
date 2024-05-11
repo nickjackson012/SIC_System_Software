@@ -1,9 +1,11 @@
 # class SICConvert
-from SIC_Utilities.sic_constants import NUMBER_OF_BITS_IN_A_INTEGER, MINIMUM_INTEGER, MAXIMUM_INTEGER
+from SIC_Utilities.sic_constants import NUMBER_OF_BITS_IN_A_INTEGER, MINIMUM_INTEGER, MAXIMUM_INTEGER, HEX_TO_BIN_DICT, \
+    BIN_TO_HEX_DICT
 
 
 class SICIntegerError(Exception):
     pass
+
 
 def bin_string_to_dec(bin_value_string: str):
     # Confirm bin_value is a string
@@ -54,20 +56,20 @@ def bin_string_to_dec(bin_value_string: str):
 # Test Bed
 
 
-try:
-    dec_value1 = bin_string_to_dec("101010101010101010101010")
-    print("dec_value1:", dec_value1)
-    dec_value2 = bin_string_to_dec("000000000000000010101010")
-    print("dec_value2:", dec_value2)
-    dec_value3 = bin_string_to_dec("101011101010101010101011")
-    print("dec_value3:", dec_value3)
-    dec_value4 = bin_string_to_dec("01010101010101010101010")
-    print("dec_value4:", dec_value4)
-    dec_value5 = bin_string_to_dec("101010101010101111010101010")
-    print("dec_value5:", dec_value5)
-
-except SICIntegerError:
-    print("Invalid Value")
+# try:
+#     dec_value1 = bin_string_to_dec("101010101010101010101010")
+#     print("dec_value1:", dec_value1)
+#     dec_value2 = bin_string_to_dec("000000000000000010101010")
+#     print("dec_value2:", dec_value2)
+#     dec_value3 = bin_string_to_dec("101011101010101010101011")
+#     print("dec_value3:", dec_value3)
+#     dec_value4 = bin_string_to_dec("01010101010101010101010")
+#     print("dec_value4:", dec_value4)
+#     dec_value5 = bin_string_to_dec("101010101010101111010101010")
+#     print("dec_value5:", dec_value5)
+#
+# except SICIntegerError:
+#     print("Invalid Value")
 
 
 # Exceptions: ValueError, IntegerOutOfRangeError
@@ -126,16 +128,43 @@ def dec_to_bin_string(dec_value: int):
     return binary_number_string
 
 
+def hex_to_bin(hex_string):
+    bin_string = ""
+    # Register holds 24 bits
+    # range(start, stop, step)
+    for hex_digit in hex_string:
+        bin_string += HEX_TO_BIN_DICT[hex_digit]
+    return bin_string
+
+
+def bin_to_hex(bin_string):
+    hex_string = ""
+    # Register holds 24 bits
+    # range(start, stop, step)
+    for index in range(0, 24, 4):
+        hex_string += BIN_TO_HEX_DICT[bin_string[index:index + 4]]
+    return hex_string
+
+
+def hex_string_to_dec(hex_string: str):
+    bin_string = hex_to_bin(hex_string)
+
+    return bin_string_to_dec(bin_string)
+
+
+def dec_to_hex_string(dec_value: int):
+    bin_string = dec_to_bin_string(dec_value)
+
+    return bin_to_hex(bin_string)
+
 # Test Bed
-
-
-try:
-    binary_value1 = dec_to_bin_string(-5592406)
-    print("binary_value1", binary_value1)
-    binary_value2 = dec_to_bin_string(170)
-    print("binary_value2", binary_value2)
-    binary_value3 = dec_to_bin_string(-5330261)
-    print("binary_value3", binary_value3)
-
-except SICIntegerError:
-    print("Invalid Value")
+# try:
+#     binary_value1 = dec_to_bin_string(-5592406)
+#     print("binary_value1", binary_value1)
+#     binary_value2 = dec_to_bin_string(170)
+#     print("binary_value2", binary_value2)
+#     binary_value3 = dec_to_bin_string(-5330261)
+#     print("binary_value3", binary_value3)
+#
+# except SICIntegerError:
+#     print("Invalid Value")
