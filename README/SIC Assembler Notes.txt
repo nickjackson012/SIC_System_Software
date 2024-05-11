@@ -134,5 +134,5 @@ The contents of memory are displayed in HEX (4 BITS each)
 Two consecutive HEX characters represent 1 BYTE (8 BITS)
 Each ROW displays 16:D BYTES in memory
 Each ROW ADDRESS is incremented by 16:D (10:H)
-Mememory LOCATION 1000:H is where ASSEMBLY CODE begins LOADING by default
+Memory LOCATION 1000:H is where ASSEMBLY CODE begins LOADING by default
 

@@ -75,7 +75,7 @@ def execute_operation(REGISTER_DICT, MEMORY_MODEL):
     # Verify that the opcode is supported by the simulator.
     if opcode_mnemonic is None:
         print_error("UNRECOGNIZED OPCODE FAULT: Halting program execution",
-                    "OPCODE:" + opcode_hex_string + "\n")
+                    "OPCODE: " + opcode_hex_string + "\n")
         continue_execution = False
         return continue_execution
 
