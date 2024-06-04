@@ -2,13 +2,15 @@ import os
 import sys
 
 from SIC_Peripherals.sic_output_device_05 import initialize_output_device_05
-from SIC_Simulator.sic_assembly_listing_parser import sic_assembly_listing_parser, print_assembly_listing_line
+from SIC_Simulator.sic_assembly_listing_parser import sic_assembly_listing_parser, print_assembly_listing_line, \
+    SICAssemblyListingParserError
 from SIC_Simulator.sic_configuration import SIC_DEFAULT_WORKING_DIRECTORY
 from SIC_Simulator.sic_loader import load_program_object_code
 from SIC_Simulator.sic_memory_model import MEMORY_MODEL
-from SIC_Simulator.sic_object_code_parser import sic_object_code_parser
+from SIC_Simulator.sic_object_code_parser import sic_object_code_parser, SICObjectCodeParserError
 from SIC_Simulator.sic_operation_executor import execute_operation
-from SIC_Simulator.sic_register_model import dump_registers, REGISTER_DICT, REGISTER_PC, initialize_registers
+from SIC_Simulator.sic_register_model import dump_registers, REGISTER_DICT, REGISTER_PC, initialize_registers, \
+    SICRegisterContentsError
 from SIC_Utilities.sic_constants import SIC_OBJECT_CODE_FILE_EXTENSION, SIC_ASSEMBLY_LISTING_FILE_EXTENSION
 from SIC_Utilities.sic_messaging import print_status, print_error
 
@@ -120,7 +122,8 @@ while True:
                     # STATUS
                     print_status(program_file_name + " loaded and ready to run")
                     mode = "RUN"
-                except SICSimulatorError as ex:
+                except (SICSimulatorError, SICObjectCodeParserError,
+                        SICAssemblyListingParserError, SICRegisterContentsError) as ex:
                     print_error(str(ex))
             case "Q":
                 print(QUIT_CONFIRM)
