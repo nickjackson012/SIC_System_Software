@@ -11,7 +11,7 @@ All Columns are right justified
 INPUT RULES Page 455
 ===============================================================================
 1) The LABEL on a SOURCE PROGRAM statement, if present, must begin in column 1 
-of the statement.  The OPCODE field is seperated from LABEL field bay at least 
+of the statement.  The OPCODE field is separated from LABEL field bay at least
 one blank; if no LABEL is present, the OPCODE may begin anywhere after column 1
 
 2) LABELS may be from 1 to 6 characters in length.  The first character must be
@@ -28,7 +28,7 @@ from SYMBOLS) and must be between 0000 and 0FFFF in value
 
 5) A HEXIDECIMAL string OPERAND in a BYTE directive must be of the form
 X'hhh...', where each h is a character representing a HEXIDECIMAL digit (0-9 or
-A-F).  There must be an even number of such HEXIDECIMAL digits.  The maximun
+A-F).  There must be an even number of such HEXIDECIMAL digits.  The maximum
 length of the string is 32 HEX digits (representing 16 bytes in memory)
 
 6)The SOURCE PROGRAM may contain as many as 500 distinct LABELS
@@ -86,7 +86,7 @@ from SYMBOLS) and must be between 0000 and 0FFFF in value
 HEX VALUES must an even number of such HEXIDECIMAL digits.  The maximum length of the string is 32 HEX digits 
 (35 characters total, representing 16 bytes in memory).  EXAMPLE:  X'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH'
 ASCII CHARACTERS can have a maximum of 32 characters (C'1-32 ASCII CHARS')
-6d) Indexed Addressing is indicated by adding the modifer ",X" following 
+6d) Indexed Addressing is indicated by adding the modifier ",X" following
 the OPERAND.  EXAMPLE:
 			LDCH		BUFFER,X
 IE: Memory address of BUFFER plus value in the X register.  
